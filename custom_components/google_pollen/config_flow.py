@@ -1,5 +1,7 @@
 """Config flow for Google Pollen integration."""
 
+from __future__ import annotations
+
 import logging
 import re
 from typing import Any
@@ -115,7 +117,9 @@ class GooglePollenConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         # Initialize self._init_info with the current entry data if not already set
         if not self._init_info:
-            self._init_info = dict(self.hass.config_entries.async_get_entry(self.context["entry_id"]).data)
+            entry = self.hass.config_entries.async_get_entry(self.context["entry_id"])
+            if entry:
+                self._init_info = dict(entry.data)
 
         # Fetch pollen data to populate self._pollen_categories and other attributes
         await self._fetch_pollen_data(self._init_info, user_input)
@@ -125,39 +129,16 @@ class GooglePollenConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._init_info[CONF_POLLEN_CATEGORIES] = user_input[CONF_POLLEN_CATEGORIES]
             self._init_info[CONF_POLLEN] = user_input[CONF_POLLEN]
 
-            # Handle addition and removal of entities
-            current_categories = set(self._init_info.get(CONF_POLLEN_CATEGORIES, []))
-            new_categories = set(user_input[CONF_POLLEN_CATEGORIES])
-            removed_categories = current_categories - new_categories
-            added_categories = new_categories - current_categories
+            # Get the config entry
+            entry = self.hass.config_entries.async_get_entry(self.context["entry_id"])
+            if entry:
+                # Update the configuration entry with the new selections
+                self.hass.config_entries.async_update_entry(entry, data=self._init_info)
 
-            current_pollen = set(self._init_info.get(CONF_POLLEN, []))
-            new_pollen = set(user_input[CONF_POLLEN])
-            removed_pollen = current_pollen - new_pollen
-            added_pollen = new_pollen - current_pollen
+                # Reload the entry to apply changes
+                return self.async_update_reload_and_abort(entry, reason="reconfigured")
 
-            # Remove entities for deselected categories and pollen
-            for category in removed_categories:
-                await self.hass.config_entries.async_remove(category)
-            for pollen in removed_pollen:
-                await self.hass.config_entries.async_remove(pollen)
-
-            # Add entities for newly selected categories and pollen
-            for category in added_categories:
-                await self.hass.config_entries.async_add(category)
-            for pollen in added_pollen:
-                await self.hass.config_entries.async_add(pollen)
-
-             # Update the configuration entry with the new selections
-            self.hass.config_entries.async_update_entry(
-                self.hass.config_entries.async_get_entry(self.context["entry_id"]),
-                data=self._init_info,
-            )
-
-            return self.async_update_reload_and_abort(self.hass.config_entries.async_get_entry(self.context["entry_id"]), reason="reconfigured")
-
-
-         # Map stored codes back to display names for default values
+        # Map stored codes back to display names for default values
         selected_categories = [
             code
             for code in self._init_info.get(CONF_POLLEN_CATEGORIES, [])

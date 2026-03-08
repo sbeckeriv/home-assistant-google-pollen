@@ -1,17 +1,19 @@
 """Integration for Google Pollen sensors."""
+from __future__ import annotations
+
 import logging
+from typing import Any
 
-import voluptuous as vol
-
-from homeassistant.components.sensor import PLATFORM_SCHEMA
+from homeassistant.components.sensor import SensorEntity
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_API_KEY,
     CONF_LANGUAGE,
     CONF_LATITUDE,
     CONF_LONGITUDE,
 )
-import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.entity import Entity
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
@@ -23,20 +25,14 @@ from .const import (
     POLLEN_CATEGORIES,
 )
 from .coordinator import GooglePollenDataUpdateCoordinator
-from homeassistant.core import HomeAssistant
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-    {
-        vol.Required(CONF_API_KEY): cv.string,
-        vol.Required(CONF_LATITUDE): cv.latitude,
-        vol.Required(CONF_LONGITUDE): cv.longitude,
-        vol.Optional(CONF_LANGUAGE, default=DEFAULT_LANGUAGE): cv.string,
-    }
-)
-
-async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up the Google Pollen sensor from a config entry."""
     api_key = config_entry.data[CONF_API_KEY]
     latitude = config_entry.data[CONF_LATITUDE]
@@ -63,14 +59,13 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
     async_add_entities(entities, True)
 
 
-class GooglePollenSensor(CoordinatorEntity, Entity):
+class GooglePollenSensor(CoordinatorEntity, SensorEntity):
     """Representation of a Google Pollen sensor."""
 
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, pollen_type):
+    def __init__(self, coordinator: GooglePollenDataUpdateCoordinator, pollen_type: str) -> None:
         """Initialize the Google Pollen sensor."""
-
         super().__init__(coordinator)
         self._pollen_type = pollen_type
         self._attr_unique_id = f"google_pollen_{pollen_type.lower()}_{coordinator.latitude}_{coordinator.longitude}"
@@ -85,10 +80,8 @@ class GooglePollenSensor(CoordinatorEntity, Entity):
             "sw_version": "1.0",
             "entry_type": "service",
         }
-        self._attr_device_class = "enum"
-        self._attr_state_class = "measurement"
 
-    def get_display_name(self, pollen_type):
+    def get_display_name(self, pollen_type: str) -> str:
         """Get the display name for the pollen type."""
         return (
             self.coordinator.data.get(pollen_type, {})
@@ -97,7 +90,7 @@ class GooglePollenSensor(CoordinatorEntity, Entity):
         )
 
     @property
-    def state(self):
+    def native_value(self) -> str | None:
         """Return the state of the sensor."""
         return (
             self.coordinator.data.get(self._pollen_type, {})
@@ -106,11 +99,11 @@ class GooglePollenSensor(CoordinatorEntity, Entity):
         )
 
     @property
-    def extra_state_attributes(self):
+    def extra_state_attributes(self) -> dict[str, Any]:
         """Return the extra state attributes of the sensor."""
         return self.coordinator.data.get(self._pollen_type, {}).get(0, {})
 
     @property
-    def icon(self):
+    def icon(self) -> str:
         """Return the icon of the sensor."""
         return "mdi:flower-pollen"

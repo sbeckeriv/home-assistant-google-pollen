@@ -1,8 +1,13 @@
 """Coordinator for Google Pollen data updates."""
+
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 import logging
+from typing import Any
 
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .utils import fetch_pollen_data
 
@@ -11,9 +16,18 @@ _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(hours=4)
 
 
-class GooglePollenDataUpdateCoordinator(DataUpdateCoordinator):
+class GooglePollenDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Coordinator for fetching and updating Google Pollen data."""
-    def __init__(self, hass, api_key, latitude, longitude, language):
+
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        api_key: str,
+        latitude: float,
+        longitude: float,
+        language: str,
+    ) -> None:
+        """Initialize the coordinator."""
         self.api_key = api_key
         self.latitude = latitude
         self.longitude = longitude
@@ -26,7 +40,8 @@ class GooglePollenDataUpdateCoordinator(DataUpdateCoordinator):
             update_interval=SCAN_INTERVAL,
         )
 
-    async def _async_update_data(self):
+    async def _async_update_data(self) -> dict[str, Any]:
+        """Fetch data from API."""
         try:
             data = await fetch_pollen_data(
                 api_key=self.api_key,
@@ -39,8 +54,8 @@ class GooglePollenDataUpdateCoordinator(DataUpdateCoordinator):
             _LOGGER.debug("Pollen data: %s", data)
 
             if "error" in data:
-                _LOGGER.error(data["error"]["message"])
-                return {}
+                error_message = data["error"]["message"]
+                raise UpdateFailed(f"Error communicating with API: {error_message}")
 
             daily_info = data.get("dailyInfo", [])
             result = {}
@@ -85,8 +100,8 @@ class GooglePollenDataUpdateCoordinator(DataUpdateCoordinator):
             return result
 
         except (ConnectionError, TimeoutError) as error:
-            _LOGGER.error("Network error updating Google Pollen data: %s", error)
-            return {}
+            raise UpdateFailed(f"Network error updating Google Pollen data: {error}") from error
         except ValueError as error:
-            _LOGGER.error("Data error updating Google Pollen data: %s", error)
-            return {}
+            raise UpdateFailed(f"Data error updating Google Pollen data: {error}") from error
+        except Exception as error:
+            raise UpdateFailed(f"Unexpected error updating Google Pollen data: {error}") from error

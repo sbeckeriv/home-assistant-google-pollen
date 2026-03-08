@@ -1,5 +1,9 @@
 """The Google Pollen integration."""
 
+from __future__ import annotations
+
+from typing import Any
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -8,7 +12,7 @@ DOMAIN = "google_pollen"
 PLATFORMS = [Platform.SENSOR]
 
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
     """Set up the Google Pollen component."""
     hass.data.setdefault(DOMAIN, {})
     return True
