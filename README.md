@@ -17,6 +17,7 @@ A Home Assistant custom component to fetch pollen data from the Google Pollen AP
 - [Obtaining Google Pollen API Key](#obtaining-google-pollen-api-key)
 - [Usage](#usage)
   - [Devices/entities](#devicesentities)
+  - [Service: Get Pollen Forecast](#service-get-pollen-forecast)
   - [Frontend card](#frontend-card)
   - [Apex chart](#apex-chart)
   - [Frontend chips card](#frontend-chips-card)
@@ -78,6 +79,59 @@ To obtain an API key for the Google Pollen API, follow these steps:
 * For each location/service, you can tick to create entities for all the categories/types that are available for the given location.
 * The displayname of the entities will be set to the displayname that the Google Pollen API returns (according to the language configured when adding the location).
 * The state of each entity is the text representation of the Universal Pollen Index (UPI) for today. In addition, the numeric UPI (0-5) for today, tomorrow, day 3 and day 4 are available as attributes on each entity.
+
+### Service: Get Pollen Forecast
+
+The integration provides a `google_pollen.get_pollen_forecast` service that allows you to query pollen data for any latitude/longitude. This is perfect for:
+- Creating notifications based on your phone's GPS location
+- Checking pollen levels at work, vacation spots, or along your commute
+- Building dynamic automations that respond to your location
+
+**Service Parameters:**
+- `latitude` (required): Latitude of the location (-90 to 90)
+- `longitude` (required): Longitude of the location (-180 to 180)
+- `language` (optional): Language code (default: "en")
+- `days` (optional): Number of forecast days 1-5 (default: 1)
+
+**Example Service Call:**
+```yaml
+service: google_pollen.get_pollen_forecast
+data:
+  latitude: 59.9139
+  longitude: 10.7522
+  language: en
+  days: 3
+```
+
+**Example Automation - Pollen Alert When Arriving at Work:**
+```yaml
+automation:
+  - alias: "Pollen Alert at Work"
+    trigger:
+      - platform: zone
+        entity_id: device_tracker.my_phone
+        zone: zone.work
+        event: enter
+    action:
+      - service: google_pollen.get_pollen_forecast
+        data:
+          latitude: "{{ state_attr('zone.work', 'latitude') }}"
+          longitude: "{{ state_attr('zone.work', 'longitude') }}"
+          days: 1
+        response_variable: pollen_data
+      - if:
+          - condition: template
+            value_template: >
+              {% set grass = pollen_data.dailyInfo[0].pollenTypeInfo | selectattr('code', 'eq', 'GRASS') | first %}
+              {{ grass.indexInfo.value | float > 3.0 }}
+        then:
+          - service: notify.mobile_app_my_phone
+            data:
+              title: "High Pollen at Work!"
+              message: "Grass pollen level is high today."
+```
+
+For more automation examples, see [SERVICE_EXAMPLES.md](SERVICE_EXAMPLES.md).
 
 ### Frontend card
 Inspired by @vdbrink (https://vdbrink.github.io/homeassistant/homeassistant_hacs_kleenex.html), I made an example on how to display this in a card in a dashboard - like the screenshot at the top.

@@ -1,13 +1,18 @@
 {
   "domain": "google_pollen",
   "name": "Google pollen",
-  "codeowners": ["@svenove"],
+  "codeowners": [
+    "@svenove"
+  ],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/svenove/home-assistant-google-pollen",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/svenove/home-assistant-google-pollen/issues",
-  "requirements": ["aiohttp", "voluptuous"],
-  "version": "0.33.0"
+  "requirements": [
+    "aiohttp",
+    "voluptuous"
+  ],
+  "version": "0.34.0"
 }

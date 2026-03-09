@@ -1,0 +1,46 @@
+get_pollen_forecast:
+  name: Get pollen forecast
+  description: Get pollen forecast data for a specific location
+  fields:
+    latitude:
+      name: Latitude
+      description: Latitude of the location
+      required: true
+      example: 59.9139
+      selector:
+        number:
+          min: -90
+          max: 90
+          step: 0.0001
+          mode: box
+    longitude:
+      name: Longitude
+      description: Longitude of the location
+      required: true
+      example: 10.7522
+      selector:
+        number:
+          min: -180
+          max: 180
+          step: 0.0001
+          mode: box
+    language:
+      name: Language
+      description: Language code for pollen names
+      required: false
+      default: en
+      example: en
+      selector:
+        text:
+    days:
+      name: Days
+      description: Number of days to forecast (1-5)
+      required: false
+      default: 1
+      example: 3
+      selector:
+        number:
+          min: 1
+          max: 5
+          step: 1
+          mode: slider
