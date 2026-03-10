@@ -26,7 +26,7 @@ get_pollen_forecast:
           mode: box
     language:
       name: Language
-      description: Language code for pollen names
+      description: Language code for pollen names (e.g., en, no, de, fr)
       required: false
       default: en
       example: en
@@ -44,3 +44,5 @@ get_pollen_forecast:
           max: 5
           step: 1
           mode: slider
+  response:
+    optional: true

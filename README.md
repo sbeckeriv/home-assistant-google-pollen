@@ -1,15 +1,16 @@
-# Home Assistant Google Pollen
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/svenove/home-assistant-google-pollen/hassfest.yaml)
-![GitHub issue custom search in repo](https://img.shields.io/github/issues-search/svenove/home-assistant-google-pollen?query=label%3Abug%20is%3Aopen&label=bugs)
-![GitHub Release](https://img.shields.io/github/v/release/svenove/home-assistant-google-pollen)
-![Github downloads total](https://img.shields.io/github/downloads/svenove/home-assistant-google-pollen/total)
-[![Buy me a coffee](https://img.shields.io/badge/Buy_me_a_coffee-ffdd00?logo=buy-me-a-coffee&logoColor=black&logoSize=auto)](https://www.buymeacoffee.com/svenove)
+# Home Assistant Google Pollen (Enhanced Fork)
+
+> **Note:** This is a fork of [svenove/home-assistant-google-pollen](https://github.com/svenove/home-assistant-google-pollen) with additional features and improvements. See [What's New in This Fork](#whats-new-in-this-fork) below.
+
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/sbeckeriv/home-assistant-google-pollen/hassfest.yaml)
+![GitHub Release](https://img.shields.io/github/v/release/sbeckeriv/home-assistant-google-pollen)
 
 A Home Assistant custom component to fetch pollen data from the Google Pollen API. 
 
 ![{B9AF4ACF-3D62-44B3-B8AE-98E4311B7C32}](https://github.com/user-attachments/assets/2b567fdf-c4b4-4cca-8290-9ef166ec90cf)
 
 ## Table of contents
+- [What's New in This Fork](#whats-new-in-this-fork)
 - [Installation](#installation)
   - [HACS (Home Assistant Community Store)](#hacs-home-assistant-community-store)
   - [Manual Installation](#manual-installation)
@@ -27,6 +28,59 @@ A Home Assistant custom component to fetch pollen data from the Google Pollen AP
 - [License](#license)
 - [Terms of use and privacy policy](#terms-of-use-and-privacy-policy)
 
+## What's New in This Fork
+
+This fork includes several enhancements and updates:
+
+| Feature                    | Upstream          | This Fork                             |
+| -------------------------- | ----------------- | ------------------------------------- |
+| **Location Query Service** | ❌ No              | ✅ `google_pollen.get_pollen_forecast` |
+| **Phone GPS Integration**  | ❌ No              | ✅ Query any lat/long                  |
+| **HA 2024+ Compatibility** | ⚠️ Deprecated APIs | ✅ Modern patterns                     |
+| **Type Hints**             | ❌ Limited         | ✅ Comprehensive                       |
+| **Error Handling**         | ⚠️ Basic           | ✅ UpdateFailed                        |
+| **Documentation**          | ✅ Good            | ✅ Enhanced + Examples                 |
+
+### 🆕 New Features
+
+#### Location-Based Pollen Query Service
+- **`google_pollen.get_pollen_forecast`** service allows querying pollen data for any latitude/longitude
+- Perfect for location-aware automations:
+  - Get notifications based on your phone's GPS location
+  - Check pollen levels at work, vacation spots, or along your commute
+  - Compare pollen between multiple locations
+- Returns full API response data for use in templates and automations
+- See [SERVICE_EXAMPLES.md](SERVICE_EXAMPLES.md) for detailed automation examples
+
+### ⚡ Technical Improvements
+
+#### Home Assistant 2024+ Compatibility
+- Updated to use modern Home Assistant patterns and APIs
+- Migrated from deprecated `Entity` to `SensorEntity`
+- Changed `state` property to `native_value`
+- Added comprehensive type hints throughout (`from __future__ import annotations`)
+- Proper error handling with `UpdateFailed` exceptions
+
+#### Code Quality Enhancements
+- Full type annotations on all functions and methods
+- Improved coordinator error handling
+- Fixed reconfigure flow issues
+- Removed invalid `device_class` and `state_class` attributes
+- Removed unused `PLATFORM_SCHEMA` (config flow only)
+
+#### HACS Compatibility
+- Converted `hacs.json` to `info.json` format
+- Updated minimum Home Assistant version requirement
+- Improved release automation
+
+### 📝 Documentation
+- Added comprehensive service usage examples
+- Updated README with new features
+- Added automation templates for common use cases
+
+### 🙏 Credits
+Original integration by [svenove](https://github.com/svenove). This fork maintains compatibility while adding new capabilities for advanced use cases.
+
 ## Installation
 
 ### HACS (Home Assistant Community Store)
@@ -35,7 +89,7 @@ A Home Assistant custom component to fetch pollen data from the Google Pollen AP
 2. Add this repository to HACS:
     - Go to HACS > Integrations.
     - Click on the three dots in the top right corner and select "Custom repositories".
-    - Add the repository URL: `https://github.com/svenove/home-assistant-google-pollen`.
+    - Add the repository URL: `https://github.com/sbeckeriv/home-assistant-google-pollen`.
 3. Find "Google Pollen" in the HACS store and click "Install".
 
 ### Manual Installation
@@ -323,10 +377,22 @@ Simply delete it manually after reconfigure.
 The entities are given IDs like "sensor.google_pollen_<pollen-type>", but with "pollen type" localized to the language selected. This means that the IDs are different per language and that it's not easy to copy/paste a dashboard card between languages since the IDs are different. The best would be that the IDs are always named after the English name, but that the display name is localized. This is on my todo-list.
 
 ## Contributions
-Thanks to [@actstorms](https://www.github.com/actstorms) for helping create the config flow (UI, instead of YAML)!
 
-Other contributions are very welcome, just submit a PR! :)
-Especially those mentioned in the "Known issues/limitations", I really would appreciate some assistance with!
+### Upstream Credits
+This fork is based on [svenove/home-assistant-google-pollen](https://github.com/svenove/home-assistant-google-pollen).
+
+Thanks to:
+- [@svenove](https://www.github.com/svenove) for creating the original integration
+- [@actstorms](https://www.github.com/actstorms) for helping create the config flow (UI, instead of YAML)
+
+### Contributing to This Fork
+Contributions are very welcome! Please submit a PR for:
+- Bug fixes specific to this fork
+- New features that enhance location-based functionality
+- Documentation improvements
+- Test coverage
+
+For issues with the core integration, consider contributing to the [upstream repository](https://github.com/svenove/home-assistant-google-pollen) as well.
 
 ## License
 

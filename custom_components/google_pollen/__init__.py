@@ -9,7 +9,7 @@ import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY, CONF_LANGUAGE, CONF_LATITUDE, CONF_LONGITUDE, Platform
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.helpers import config_validation as cv
 
 from .const import DEFAULT_LANGUAGE
@@ -49,7 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     # Register service only once
     if not hass.services.has_service(DOMAIN, SERVICE_GET_POLLEN_FORECAST):
-        async def handle_get_pollen_forecast(call: ServiceCall) -> dict[str, Any]:
+        async def handle_get_pollen_forecast(call: ServiceCall) -> ServiceResponse:
             """Handle the service call to get pollen forecast."""
             latitude = call.data[CONF_LATITUDE]
             longitude = call.data[CONF_LONGITUDE]
@@ -94,6 +94,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             SERVICE_GET_POLLEN_FORECAST,
             handle_get_pollen_forecast,
             schema=SERVICE_GET_POLLEN_FORECAST_SCHEMA,
+            supports_response=SupportsResponse.OPTIONAL,
         )
     
     return True
