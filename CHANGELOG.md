@@ -2,6 +2,13 @@
 
 All notable changes to this fork will be documented in this file.
 
+## [0.39.2] - 2026-03-10
+
+### Fixed
+- Removed `step` parameter from latitude/longitude selectors in services.yaml
+- Fixed YAML parsing error: "not a valid value for dictionary value"
+- Latitude and longitude inputs now work correctly in UI
+
 ## [0.39.0] - 2026-03-09
 
 ### Added
