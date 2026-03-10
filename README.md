@@ -146,6 +146,7 @@ The integration provides a `google_pollen.get_pollen_forecast` service that allo
 - `longitude` (required): Longitude of the location (-180 to 180)
 - `language` (optional): Language code (default: "en")
 - `days` (optional): Number of forecast days 1-5 (default: 1)
+- `api_key` (optional): Override API key (uses integration's key if not provided)
 
 **Example Service Call:**
 ```yaml

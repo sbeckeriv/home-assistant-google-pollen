@@ -44,5 +44,14 @@ get_pollen_forecast:
           max: 5
           step: 1
           mode: slider
+    api_key:
+      name: API Key
+      description: Optional Google Pollen API key (uses configured integration's key if not provided)
+      required: false
+      advanced: true
+      example: AIzaSyABCDEF1234567890
+      selector:
+        text:
+          type: password
   response:
     optional: true

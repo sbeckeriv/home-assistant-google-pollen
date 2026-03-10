@@ -2,6 +2,32 @@
 
 All notable changes to this fork will be documented in this file.
 
+## [0.39.0] - 2026-03-09
+
+### Added
+- Optional `api_key` parameter to `get_pollen_forecast` service
+- Advanced field in UI for API key override
+- Documentation for using custom API keys with secrets.yaml
+
+### Changed
+- Service now accepts optional API key parameter for multi-key scenarios
+- Falls back to configured integration's API key if not provided
+- Better support for users with multiple API keys or projects
+
+## [0.38.0] - 2026-03-09
+
+### Fixed
+- API key retrieval now uses `hass.config_entries.async_entries()` instead of internal data structure
+- Service now properly finds API key from configured integration
+- Improved error message when no API key is configured
+
+## [0.37.0] - 2026-03-09
+
+### Fixed
+- Removed empty `target:` line from services.yaml that was breaking YAML parsing
+- Service now properly displays as "Get pollen forecast" instead of "Perform action" in UI
+- Service fields now show correctly with labels and descriptions
+
 ## [0.36.0] - 2026-03-09
 
 ### Added
@@ -10,6 +36,8 @@ All notable changes to this fork will be documented in this file.
 - Comprehensive service usage examples in SERVICE_EXAMPLES.md
 - Support for querying 1-5 days of forecast data
 - Service returns full API response for use in templates and automations
+- Service properly supports `response_variable` for capturing returned data
+- `SupportsResponse.OPTIONAL` flag for proper Home Assistant service response handling
 
 ### Changed
 - Updated for Home Assistant 2024.1.0+ compatibility
@@ -34,6 +62,10 @@ All notable changes to this fork will be documented in this file.
 - Updated README with service documentation
 - Added "What's New in This Fork" section to README
 - Included credits to original author
+- Added UI instructions for using the service
+- Updated all automation examples to modern Home Assistant format (triggers/actions/conditions)
+- Added safer template patterns with proper null checking
+- Included test automation example
 
 ## Original Version History
 

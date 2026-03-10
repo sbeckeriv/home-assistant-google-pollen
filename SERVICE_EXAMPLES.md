@@ -17,6 +17,7 @@ After adding the integration, you'll find the service under "Google pollen: Get 
    - **Longitude**: Decimal longitude (-180 to 180)
    - **Language**: Language code (default: en)
    - **Days**: Number of forecast days (1-5, default: 1)
+   - **API Key** (optional): Override with specific API key (uses integration's key if not provided)
 5. Enable "**Response data**" and set a variable name (e.g., `pollen_data`)
 
 ## Basic Service Call (YAML)
@@ -29,6 +30,33 @@ data:
   language: en
   days: 3
 response_variable: pollen_data
+```
+
+### Using a Specific API Key
+
+By default, the service uses the API key from your first configured integration. If you have multiple locations configured with different API keys, or want to use a different key, you can specify it:
+
+```yaml
+service: google_pollen.get_pollen_forecast
+data:
+  latitude: 59.9139
+  longitude: 10.7522
+  days: 1
+  api_key: !secret google_pollen_api_key  # Optional: override with specific key
+response_variable: pollen_data
+```
+
+**When to use a custom API key:**
+- You have different quota limits per API key
+- You want to track usage separately for different locations/projects
+- You're testing with a development API key
+- You have multiple Google Cloud projects with different billing
+
+**Note**: Store API keys in `secrets.yaml` for security:
+```yaml
+# secrets.yaml
+google_pollen_api_key: AIzaSyABCDEF1234567890
+google_pollen_dev_key: AIzaSyXYZ9876543210
 ```
 
 ## Simple Test Automation

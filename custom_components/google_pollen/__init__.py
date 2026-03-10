@@ -29,6 +29,7 @@ SERVICE_GET_POLLEN_FORECAST_SCHEMA = vol.Schema(
         vol.Required(CONF_LONGITUDE): cv.longitude,
         vol.Optional(CONF_LANGUAGE, default=DEFAULT_LANGUAGE): cv.string,
         vol.Optional(CONF_DAYS, default=1): vol.All(vol.Coerce(int), vol.Range(min=1, max=5)),
+        vol.Optional(CONF_API_KEY): cv.string,
     }
 )
 
@@ -56,17 +57,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             language = call.data.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
             days = call.data.get(CONF_DAYS, 1)
             
-            # Get API key from the first config entry
-            api_key = None
-            for entry_id in hass.data[DOMAIN]:
-                if isinstance(hass.data[DOMAIN][entry_id], dict):
-                    api_key = hass.data[DOMAIN][entry_id].get(CONF_API_KEY)
-                    if api_key:
-                        break
+            # Get API key - from service call or configured entry
+            api_key = call.data.get(CONF_API_KEY)
             
             if not api_key:
-                _LOGGER.error("No API key found in configuration")
-                return {"error": "No API key configured"}
+                # Fall back to first configured entry's API key
+                entries = hass.config_entries.async_entries(DOMAIN)
+                if entries:
+                    api_key = entries[0].data.get(CONF_API_KEY)
+            
+            if not api_key:
+                _LOGGER.error("No API key provided or found in configuration entries")
+                return {"error": "No API key configured. Please provide api_key or set up the integration first."}
             
             try:
                 data = await fetch_pollen_data(
